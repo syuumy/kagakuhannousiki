@@ -1,51 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>化学式クイズ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #question {
+      font-size: 2.5em;
+      margin: 20px;
+    }
+    #answer {
+      font-size: 3em;
+      color: red;
+      height: 2em;
+      margin-bottom: 40px;
+    }
+    #toggleBtn {
+      font-size: 1.5em;
+      padding: 10px 30px;
+    }
+  </style>
+</head>
 <body>
-<h3 id="q">問題を読み込み中...</h3>
-<div id="buttons"></div>
-<p id="result"></p>
+  <div id="question">読み込み中...</div>
+  <div id="answer"></div>
+  <button id="toggleBtn" onclick="toggle()">答え</button>
 
-<script>
-const quiz = [
-  { q: "水を電気分解すると？", a: "B", c: ["H₂O → H₂ + O", "2H₂O → 2H₂ + O₂", "H₂O → 2H₂ + O₂"] },
-  { q: "炭酸水素ナトリウムを加熱すると？", a: "A", c: ["2NaHCO₃ → Na₂CO₃ + CO₂ + H₂O", "NaHCO₃ → Na + H₂O + CO₂", "Na₂CO₃ → Na + CO₂"] },
-  { q: "マグネシウムが酸素と反応すると？", a: "C", c: ["Mg + O → MgO", "Mg + O₂ → Mg₂O", "2Mg + O₂ → 2MgO"] },
-  { q: "銅が酸素と反応すると？", a: "B", c: ["Cu + O → CuO", "2Cu + O₂ → 2CuO", "Cu + O₂ → CuO₂"] },
-  { q: "塩酸と亜鉛の反応は？", a: "C", c: ["Zn + HCl → ZnCl + H", "Zn + Cl₂ → ZnCl₂", "Zn + 2HCl → ZnCl₂ + H₂"] },
-  { q: "酸化銀の分解は？", a: "A", c: ["2Ag₂O → 4Ag + O₂", "AgO → Ag + O", "Ag₂O₂ → Ag + O₂"] },
-  { q: "鉄が酸素と反応すると？", a: "B", c: ["Fe + O → FeO", "3Fe + 2O₂ → Fe₃O₄", "Fe₂ + O₂ → Fe₂O₂"] },
-  { q: "アルミニウムが酸素と反応すると？", a: "C", c: ["Al + O → AlO", "Al + O₂ → Al₂O", "4Al + 3O₂ → 2Al₂O₃"] },
-  { q: "水素と酸素が反応すると？", a: "A", c: ["2H₂ + O₂ → 2H₂O", "H₂ + O → H₂O", "H₂O → H₂ + O₂"] },
-  { q: "メタンの完全燃焼は？", a: "B", c: ["CH₄ + O₂ → C + H₂O", "CH₄ + 2O₂ → CO₂ + 2H₂O", "CH₄ + O₂ → CO + H₂"] },
-];
+  <script>
+    const quiz = [
+      { q: "水素", a: "H₂" }, { q: "炭素", a: "C" }, { q: "酸素", a: "O₂" },
+      { q: "窒素", a: "N₂" }, { q: "硫黄", a: "S" }, { q: "塩素", a: "Cl₂" },
+      { q: "水", a: "H₂O" }, { q: "二酸化炭素", a: "CO₂" }, { q: "塩化水素", a: "HCl" },
+      { q: "アンモニア", a: "NH₃" }, { q: "酸化銀", a: "Ag₂O" }, { q: "酸化銅", a: "CuO" },
+      { q: "酸化マグネシウム", a: "MgO" }, { q: "塩化銅", a: "CuCl₂" }, { q: "硫化鉄", a: "FeS" },
+      { q: "硫化銅", a: "CuS" }, { q: "硫酸", a: "H₂SO₄" }, { q: "炭酸ナトリウム", a: "Na₂CO₃" },
+      { q: "炭酸カルシウム", a: "CaCO₃" }, { q: "銀", a: "Ag" }, { q: "カリウム", a: "K" },
+      { q: "アルミニウム", a: "Al" }, { q: "ナトリウム", a: "Na" }, { q: "マグネシウム", a: "Mg" },
+      { q: "カルシウム", a: "Ca" }, { q: "銅", a: "Cu" }, { q: "鉄", a: "Fe" }, { q: "亜鉛", a: "Zn" },
+      { q: "炭酸水素ナトリウム", a: "NaHCO₃" }, { q: "塩化ナトリウム", a: "NaCl" }
+    ];
 
-let current = 0;
-function loadQuiz() {
-  document.getElementById("result").textContent = "";
-  const q = quiz[current];
-  document.getElementById("q").textContent = `【問${current + 1}】${q.q}`;
-  const b = document.getElementById("buttons");
-  b.innerHTML = "";
-  ["A", "B", "C"].forEach((k, i) => {
-    const btn = document.createElement("button");
-    btn.textContent = `${k}. ${q.c[i]}`;
-    btn.onclick = () => {
-      document.getElementById("result").textContent =
-        k === q.a ? "正解！" : "不正解";
-      if (current < quiz.length - 1) {
-        current++;
-        setTimeout(loadQuiz, 1000);
+    let index = 0;
+    let showingAnswer = false;
+
+    function loadQuestion() {
+      document.getElementById("question").textContent = "問：" + quiz[index].q;
+      document.getElementById("answer").textContent = "";
+      document.getElementById("toggleBtn").textContent = "答え";
+      showingAnswer = false;
+    }
+
+    function toggle() {
+      if (showingAnswer) {
+        index = (index + 1) % quiz.length;
+        loadQuestion();
       } else {
-        setTimeout(() => {
-          document.getElementById("q").textContent = "すべての問題が終了しました！";
-          b.innerHTML = "";
-        }, 1000);
+        document.getElementById("answer").textContent = "答：" + quiz[index].a;
+        document.getElementById("toggleBtn").textContent = "次へ";
+        showingAnswer = true;
       }
-    };
-    b.appendChild(btn);
-  });
-}
-loadQuiz();
-</script>
+    }
+
+    loadQuestion();
+  </script>
 </body>
 </html>
