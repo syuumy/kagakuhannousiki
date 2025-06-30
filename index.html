@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h3 id="q">問題を読み込み中...</h3>
+<div id="buttons"></div>
+<p id="result"></p>
+
+<script>
+const quiz = [
+  { q: "水を電気分解すると？", a: "B", c: ["H₂O → H₂ + O", "2H₂O → 2H₂ + O₂", "H₂O → 2H₂ + O₂"] },
+  { q: "炭酸水素ナトリウムを加熱すると？", a: "A", c: ["2NaHCO₃ → Na₂CO₃ + CO₂ + H₂O", "NaHCO₃ → Na + H₂O + CO₂", "Na₂CO₃ → Na + CO₂"] },
+  { q: "マグネシウムが酸素と反応すると？", a: "C", c: ["Mg + O → MgO", "Mg + O₂ → Mg₂O", "2Mg + O₂ → 2MgO"] },
+  { q: "銅が酸素と反応すると？", a: "B", c: ["Cu + O → CuO", "2Cu + O₂ → 2CuO", "Cu + O₂ → CuO₂"] },
+  { q: "塩酸と亜鉛の反応は？", a: "C", c: ["Zn + HCl → ZnCl + H", "Zn + Cl₂ → ZnCl₂", "Zn + 2HCl → ZnCl₂ + H₂"] },
+  { q: "酸化銀の分解は？", a: "A", c: ["2Ag₂O → 4Ag + O₂", "AgO → Ag + O", "Ag₂O₂ → Ag + O₂"] },
+  { q: "鉄が酸素と反応すると？", a: "B", c: ["Fe + O → FeO", "3Fe + 2O₂ → Fe₃O₄", "Fe₂ + O₂ → Fe₂O₂"] },
+  { q: "アルミニウムが酸素と反応すると？", a: "C", c: ["Al + O → AlO", "Al + O₂ → Al₂O", "4Al + 3O₂ → 2Al₂O₃"] },
+  { q: "水素と酸素が反応すると？", a: "A", c: ["2H₂ + O₂ → 2H₂O", "H₂ + O → H₂O", "H₂O → H₂ + O₂"] },
+  { q: "メタンの完全燃焼は？", a: "B", c: ["CH₄ + O₂ → C + H₂O", "CH₄ + 2O₂ → CO₂ + 2H₂O", "CH₄ + O₂ → CO + H₂"] },
+];
+
+let current = 0;
+function loadQuiz() {
+  document.getElementById("result").textContent = "";
+  const q = quiz[current];
+  document.getElementById("q").textContent = `【問${current + 1}】${q.q}`;
+  const b = document.getElementById("buttons");
+  b.innerHTML = "";
+  ["A", "B", "C"].forEach((k, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = `${k}. ${q.c[i]}`;
+    btn.onclick = () => {
+      document.getElementById("result").textContent =
+        k === q.a ? "正解！" : "不正解";
+      if (current < quiz.length - 1) {
+        current++;
+        setTimeout(loadQuiz, 1000);
+      } else {
+        setTimeout(() => {
+          document.getElementById("q").textContent = "すべての問題が終了しました！";
+          b.innerHTML = "";
+        }, 1000);
+      }
+    };
+    b.appendChild(btn);
+  });
+}
+loadQuiz();
+</script>
+</body>
+</html>
