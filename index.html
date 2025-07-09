@@ -135,25 +135,42 @@ const drills = [
 {cat:"不定詞 enough/hard",jp:"彼は十分に速く走ることができた。",en:"He was fast enough to win the race."}
 ];
 
-/* ===== ② 表示ロジック ===== */
-let idx=0;
-const q=document.getElementById("q"),a=document.getElementById("a"),m=document.getElementById("meta");
-const pb=document.getElementById("prevBtn"),nb=document.getElementById("nextBtn"),tb=document.getElementById("toggleBtn");
-
-function show(){
- const d=drills[idx];
- m.textContent=`No.${idx+1} / 100　〈${d.cat}〉`;
- q.textContent=d.jp;
- a.textContent=d.en;
- a.style.display="none";
- tb.textContent="Show Answer";
- pb.disabled=idx===0;
- nb.disabled=idx===drills.length-1;
+/* ===== 🔀 シャッフル関数（Fisher–Yates） ===== */
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
-tb.onclick=()=>{const s=a.style.display==="none";a.style.display=s?"block":"none";tb.textContent=s?"Hide Answer":"Show Answer";}
-pb.onclick=()=>{if(idx>0){idx--;show();}}
-nb.onclick=()=>{if(idx<drills.length-1){idx++;show();}}
-show();
-</script>
+shuffle(drills); // ← ここで一度だけシャッフル
+
+/* ===== ② 表示ロジック ===== */
+let idx = 0;
+const q = document.getElementById("q"),
+      a = document.getElementById("a"),
+      m = document.getElementById("meta"),
+      pb = document.getElementById("prevBtn"),
+      nb = document.getElementById("nextBtn"),
+      tb = document.getElementById("toggleBtn");
+
+function show() {
+  const d = drills[idx];
+  m.textContent = `No.${idx + 1} / ${drills.length}　〈${d.cat}〉`;
+  q.textContent = d.jp;
+  a.textContent = d.en;
+  a.style.display = "none";
+  tb.textContent = "Show Answer";
+  pb.disabled = idx === 0;
+  nb.disabled = idx === drills.length - 1;
+}
+
+tb.onclick = () => {
+  const s = a.style.display === "none";
+  a.style.display = s ? "block" : "none";
+  tb.textContent = s ? "Hide Answer" : "Show Answer";
+};
+pb.onclick = () => { if (idx > 0) { idx--; show(); } };
+nb.onclick = () => { if (idx < drills.length - 1) { idx++; show(); } };
+show();</script>
 </body>
 </html>
