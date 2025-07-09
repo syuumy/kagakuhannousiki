@@ -1,75 +1,159 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>化学式クイズ</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    #question {
-      font-size: 2.5em;
-      margin: 20px;
-    }
-    #answer {
-      font-size: 3em;
-      color: red;
-      height: 2em;
-      margin-bottom: 40px;
-    }
-    #toggleBtn {
-      font-size: 1.5em;
-      padding: 10px 30px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>中学英語フラッシュカード100</title>
+<meta charset="UTF-8">
+<style>
+ body{font:1.1rem/1.6 "Segoe UI",sans-serif;background:#f7fafd;margin:0;padding:2rem;text-align:center;}
+ #card{max-width:720px;margin:0 auto;padding:2rem;border-radius:1rem;background:#fff;
+       box-shadow:0 4px 14px rgba(0,0,0,.08);}
+ #meta{font-size:.9rem;color:#666;margin-bottom:.4rem;}
+ #q{font-weight:700;font-size:1.25rem;}
+ #a{margin-top:1rem;font-size:1.1rem;color:#064;display:none;}
+ button{margin:1.5rem .6rem;padding:.6rem 1.3rem;border:none;border-radius:.4rem;
+        font-size:1rem;cursor:pointer;background:#1976d2;color:#fff;}
+ button:disabled{opacity:.35;cursor:default;}
+</style>
 </head>
 <body>
-  <div id="question">読み込み中...</div>
-  <div id="answer"></div>
-  <button id="toggleBtn" onclick="toggle()">答え</button>
+<div id="card">
+  <div id="meta"></div>
+  <div id="q"></div>
+  <div id="a"></div>
+  <button id="prevBtn">Prev</button>
+  <button id="toggleBtn">Show&nbsp;Answer</button>
+  <button id="nextBtn">Next</button>
+</div>
 
-  <script>
-    const quiz = [
-      { q: "水", a: "H₂" }, { q: "炭素", a: "C" }, { q: "酸素", a: "O₂" },
-      { q: "窒素", a: "N₂" }, { q: "硫黄", a: "S" }, { q: "塩素", a: "Cl₂" },
-      { q: "水", a: "H₂O" }, { q: "二酸化炭素", a: "CO₂" }, { q: "塩化水素", a: "HCl" },
-      { q: "アンモニア", a: "NH₃" }, { q: "酸化銀", a: "Ag₂O" }, { q: "酸化銅", a: "CuO" },
-      { q: "酸化マグネシウム", a: "MgO" }, { q: "塩化銅", a: "CuCl₂" }, { q: "硫化鉄", a: "FeS" },
-      { q: "硫化銅", a: "CuS" }, { q: "硫酸", a: "H₂SO₄" }, { q: "炭酸ナトリウム", a: "Na₂CO₃" },
-      { q: "炭酸カルシウム", a: "CaCO₃" }, { q: "銀", a: "Ag" }, { q: "カリウム", a: "K" },
-      { q: "アルミニウム", a: "Al" }, { q: "ナトリウム", a: "Na" }, { q: "マグネシウム", a: "Mg" },
-      { q: "カルシウム", a: "Ca" }, { q: "銅", a: "Cu" }, { q: "鉄", a: "Fe" }, { q: "亜鉛", a: "Zn" },
-      { q: "炭酸水素ナトリウム", a: "NaHCO₃" }, { q: "塩化ナトリウム", a: "NaCl" }
-    ];
+<script>
+/* ===== ① 100題データ ===== */
+const drills = [
+{cat:"be動詞肯定",jp:"私は野球部の一員です。",en:"I am a member of the baseball club."},
+{cat:"be動詞否定",jp:"彼らは今，図書館にいません。",en:"They are not in the library now."},
+{cat:"be動詞疑問",jp:"あなたは13歳ですか。",en:"Are you thirteen years old?"},
+{cat:"一般動詞現在肯定",jp:"彼は毎朝６時に起きる。",en:"He gets up at six every morning."},
+{cat:"一般動詞現在否定",jp:"私は英語を話しません。",en:"I do not speak English."},
+{cat:"一般動詞現在疑問",jp:"あなたは毎日ピアノを練習しますか。",en:"Do you practice the piano every day?"},
+{cat:"過去肯定",jp:"彼女は昨夜テレビを見ました。",en:"She watched TV last night."},
+{cat:"過去否定",jp:"私たちは昨日雨の中を歩きませんでした。",en:"We did not walk in the rain yesterday."},
+{cat:"過去疑問",jp:"あなたは先週京都を訪れましたか。",en:"Did you visit Kyoto last week?"},
+{cat:"進行形肯定",jp:"私は今宿題をしています。",en:"I am doing my homework now."},
+{cat:"進行形否定",jp:"彼らは公園でサッカーをしていません。",en:"They are not playing soccer in the park."},
+{cat:"進行形疑問",jp:"彼は何を読んでいるのですか。",en:"What is he reading?"},
+{cat:"未来形肯定",jp:"明日は晴れるでしょう。",en:"It will be sunny tomorrow."},
+{cat:"未来形否定",jp:"彼女は来週ここに来ないでしょう。",en:"She will not come here next week."},
+{cat:"未来形疑問",jp:"あなたはその本を今夜読みますか。",en:"Will you read the book tonight?"},
+{cat:"現在完了経験",jp:"私は富士山に登ったことがあります。",en:"I have climbed Mt. Fuji."},
+{cat:"現在完了経験否定",jp:"彼は一度も寿司を食べたことがありません。",en:"He has never eaten sushi."},
+{cat:"現在完了経験疑問",jp:"あなたはこの映画を見たことがありますか。",en:"Have you seen this movie?"},
+{cat:"現在完了継続",jp:"昨日からずっと雨が降っています。",en:"It has been raining since yesterday."},
+{cat:"現在完了継続",jp:"彼女は3時間ピアノを弾いています。",en:"She has been playing the piano for three hours."},
+{cat:"現在完了完了",jp:"私は宿題を終えたところです。",en:"I have just finished my homework."},
+{cat:"比較級 as〜as",jp:"その少年は私と同じくらい速く走る。",en:"The boy runs as fast as I."},
+{cat:"比較級",jp:"ケンはエイミーより背が高い。",en:"Ken is taller than Amy."},
+{cat:"最上級",jp:"この川は日本で一番長い。",en:"This river is the longest in Japan."},
+{cat:"動名詞主語",jp:"英語を勉強することは面白い。",en:"Studying English is interesting."},
+{cat:"動名詞主語",jp:"早起きは健康によい。",en:"Getting up early is good for your health."},
+{cat:"動名詞補語",jp:"私の趣味は写真を撮ることです。",en:"My hobby is taking pictures."},
+{cat:"不定詞形容詞用法",jp:"私は泳ぐ方法を知っています。",en:"I know how to swim."},
+{cat:"不定詞副詞用法",jp:"私たちは彼を助けるために走った。",en:"We ran to help him."},
+{cat:"不定詞 to 不定 / too〜to",jp:"その箱は重すぎて運べない。",en:"The box is too heavy to carry."},
+{cat:"助動詞 can",jp:"彼は速く走ることができる。",en:"He can run fast."},
+{cat:"助動詞 must",jp:"私は明日そこへ行かなければならない。",en:"I must go there tomorrow."},
+{cat:"助動詞 may",jp:"彼は昼食を食べてもよい。",en:"He may eat lunch."},
+{cat:"助動詞 should",jp:"あなたはここで静かにすべきです。",en:"You should be quiet here."},
+{cat:"助動詞 have to",jp:"私は昨日宿題をする必要がなかった。",en:"I didn't have to do my homework yesterday."},
+{cat:"接続詞 if",jp:"もし雨なら、私は家にいます。",en:"If it rains, I will stay home."},
+{cat:"接続詞 when",jp:"彼が来たら、知らせてください。",en:"Please tell me when he comes."},
+{cat:"接続詞 so ... that",jp:"彼はあまりにも疲れていたので歩けなかった。",en:"He was so tired that he couldn't walk."},
+{cat:"接続詞 because",jp:"私は病気だったので、学校を休んだ。",en:"Because I was sick, I was absent from school."},
+{cat:"接続詞 although",jp:"彼は若いけれど、とても賢い。",en:"Although he is young, he is very smart."},
+{cat:"倒置 so do I",jp:"私はテニスが好きで、兄もそうです。",en:"I like tennis, and so does my brother."},
+{cat:"that節",jp:"私は英語は難しいと思います。",en:"I think that English is difficult."},
+{cat:"名詞節 what",jp:"私は何をすべきか分からない。",en:"I don't know what to do."},
+{cat:"関係代名詞主格",jp:"これは私が東京で買った本です。",en:"This is the book that I bought in Tokyo."},
+{cat:"関係代名詞 who",jp:"私には京都に住む友達がいます。",en:"I have a friend who lives in Kyoto."},
+{cat:"there is",jp:"机の上に猫がいます。",en:"There is a cat on the table."},
+{cat:"there are",jp:"公園にはたくさんの子供がいます。",en:"There are many children in the park."},
+{cat:"接続詞 but",jp:"彼は速く走るが、私はもっと速く走る。",en:"He runs fast, but I run faster."},
+{cat:"接続詞 or",jp:"私は牛乳か水が欲しい。",en:"I want milk or water."},
+{cat:"比較 prefer",jp:"私はテニスよりサッカーの方が好きです。",en:"I prefer soccer to tennis."},
+{cat:"enough to",jp:"彼は十分なお金を持っていない。",en:"He doesn't have enough money."},
+{cat:"be glad to",jp:"あなたに会えてうれしいです。",en:"I am glad to see you."},
+{cat:"to不定詞名詞的",jp:"休むことは大切です。",en:"It is important to rest."},
+{cat:"命令文 and / or",jp:"右に曲がれば銀行があります。",en:"Turn right, and you will find the bank."},
+{cat:"without",jp:"あなたの助けがなければ私はできなかった。",en:"Without your help, I could not have done it."},
+{cat:"had better",jp:"私は早く寝たほうがいい。",en:"I'd better go to bed early."},
+{cat:"be good at",jp:"彼女はケーキを作るのが上手です。",en:"She is good at making cakes."},
+{cat:"受動態",jp:"彼は東京で生まれ育った。",en:"He was born and brought up in Tokyo."},
+{cat:"to不定詞 become",jp:"医者になることが彼の夢です。",en:"His dream is to become a doctor."},
+{cat:"make + O + C",jp:"野球をすることは私たちを幸せにする。",en:"Playing baseball makes us happy."},
+{cat:"疑問詞 when",jp:"あなたはいつ東京に来たのですか。",en:"When did you come to Tokyo?"},
+{cat:"疑問詞 why",jp:"なぜ遅れたのですか。",en:"Why were you late?"},
+{cat:"疑問詞 how",jp:"彼はどのように学校に行きますか。",en:"How does he go to school?"},
+{cat:"現在完了 just",jp:"私はちょうど昼食を食べ終えた。",en:"I have just finished lunch."},
+{cat:"現在完了 yet",jp:"あなたはもう宿題を終えましたか。",en:"Have you finished your homework yet?"},
+{cat:"現在完了 already",jp:"彼はすでにその本を読みました。",en:"He has already read the book."},
+{cat:"疑問詞 which",jp:"どちらの本がより面白いですか。",en:"Which book is more interesting?"},
+{cat:"疑問詞 what",jp:"あなたは昨日何をしましたか。",en:"What did you do yesterday?"},
+{cat:"SVOO",jp:"彼は私に英語を教えてくれた。",en:"He taught me English."},
+{cat:"SVOO",jp:"母は私に新しい時計を買ってくれた。",en:"My mother bought me a new watch."},
+{cat:"to不定詞主語",jp:"英語を話すことは難しい。",en:"To speak English is difficult."},
+{cat:"tell + O + to",jp:"彼は私に速く走るように言った。",en:"He told me to run fast."},
+{cat:"付加疑問",jp:"あなたは学生ですよね。",en:"You are a student, aren't you?"},
+{cat:"感嘆文",jp:"なんて美しい花でしょう! ",en:"What a beautiful flower!"},
+{cat:"否定語〜either",jp:"私は野球が好きではないし、弟も好きではない。",en:"I don't like baseball, and my brother doesn't like it either."},
+{cat:"否定語〜never",jp:"私は決して遅刻しません。",en:"I never come late."},
+{cat:"副詞比較",jp:"私の父は私より早く起きます。",en:"My father gets up earlier than I."},
+{cat:"to be動詞+形容詞+for",jp:"彼は私にとってとても親切だった。",en:"He was very kind to me."},
+{cat:"so ... that",jp:"彼女はあまりに速く走ったので私は追いつけなかった。",en:"She ran so fast that I couldn't catch up with her."},
+{cat:"不定詞 it 〜 for",jp:"あなたにとって英語を学ぶことは重要です。",en:"It is important for you to learn English."},
+{cat:"前置詞 during",jp:"私は夏休みの間に多くの本を読んだ。",en:"I read many books during the summer vacation."},
+{cat:"would like",jp:"私は水を一杯いただきたいです。",en:"I would like a glass of water."},
+{cat:"疑問詞 how long",jp:"どれくらい山口に滞在するつもりですか。",en:"How long will you stay in Yamaguchi?"},
+{cat:"by 〜ing",jp:"英語は英語で考えることで上達します。",en:"You can improve your English by thinking in English."},
+{cat:"since/for",jp:"私は３年間ずっと彼を知っています。",en:"I have known him for three years."},
+{cat:"be made of",jp:"この机は木でできています。",en:"This desk is made of wood."},
+{cat:"比較 a lot",jp:"英語は日本語よりずっと難しい。",en:"English is a lot more difficult than Japanese."},
+{cat:"both A and B",jp:"彼は英語とフランス語の両方を話す。",en:"He speaks both English and French."},
+{cat:"either A or B",jp:"私は図書館か美術館のどちらかへ行きたい。",en:"I want to go to either the library or the museum."},
+{cat:"neither nor",jp:"私はピアノもギターも弾きません。",en:"I play neither the piano nor the guitar."},
+{cat:"前置詞 to",jp:"私は駅まで歩いた。",en:"I walked to the station."},
+{cat:"前置詞 into",jp:"彼は部屋の中に入った。",en:"He went into the room."},
+{cat:"感嘆文 How",jp:"彼女はなんて速く走るのでしょう! ",en:"How fast she runs!"},
+{cat:"最上級 ever",jp:"これは今までで一番楽しいパーティーです。",en:"This is the most enjoyable party I have ever had."},
+{cat:"分詞構文",jp:"雨が降っていたので、私は外出しなかった。",en:"It raining, I didn't go out."},
+{cat:"受動態 by",jp:"彼は有名な歌手によって知られている。",en:"He is known by a famous singer."},
+{cat:"過去完了",jp:"私が駅に着いたとき、電車は出てしまっていた。",en:"When I arrived at the station, the train had left."},
+{cat:"未来完了",jp:"来年までに私はその本を読んでしまっているでしょう。",en:"I will have read the book by next year."},
+{cat:"疑問詞 whose",jp:"これは誰のかばんですか。",en:"Whose bag is this?"},
+{cat:"仮定法過去",jp:"もし私が鳥なら、あなたのところへ飛んで行くのに。",en:"If I were a bird, I would fly to you."},
+{cat:"助動詞 should have",jp:"もっと一生懸命勉強すべきだった。",en:"I should have studied harder."},
+{cat:"make/let",jp:"母は私に部屋を掃除させた。",en:"My mother made me clean my room."},
+{cat:"目的語説明型",jp:"私はあなたを幸せにしたい。",en:"I want you to be happy."},
+{cat:"不定詞 enough/hard",jp:"彼は十分に速く走ることができた。",en:"He was fast enough to win the race."}
+];
 
-    let index = 0;
-    let showingAnswer = false;
+/* ===== ② 表示ロジック ===== */
+let idx=0;
+const q=document.getElementById("q"),a=document.getElementById("a"),m=document.getElementById("meta");
+const pb=document.getElementById("prevBtn"),nb=document.getElementById("nextBtn"),tb=document.getElementById("toggleBtn");
 
-    function loadQuestion() {
-      document.getElementById("question").textContent = "問：" + quiz[index].q;
-      document.getElementById("answer").textContent = "";
-      document.getElementById("toggleBtn").textContent = "答え";
-      showingAnswer = false;
-    }
-
-    function toggle() {
-      if (showingAnswer) {
-        index = (index + 1) % quiz.length;
-        loadQuestion();
-      } else {
-        document.getElementById("answer").textContent = "答：" + quiz[index].a;
-        document.getElementById("toggleBtn").textContent = "次へ";
-        showingAnswer = true;
-      }
-    }
-
-    loadQuestion();
-  </script>
+function show(){
+ const d=drills[idx];
+ m.textContent=`No.${idx+1} / 100　〈${d.cat}〉`;
+ q.textContent=d.jp;
+ a.textContent=d.en;
+ a.style.display="none";
+ tb.textContent="Show Answer";
+ pb.disabled=idx===0;
+ nb.disabled=idx===drills.length-1;
+}
+tb.onclick=()=>{const s=a.style.display==="none";a.style.display=s?"block":"none";tb.textContent=s?"Hide Answer":"Show Answer";}
+pb.onclick=()=>{if(idx>0){idx--;show();}}
+nb.onclick=()=>{if(idx<drills.length-1){idx++;show();}}
+show();
+</script>
 </body>
 </html>
